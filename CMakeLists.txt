@@ -37,7 +37,7 @@ include(GNUInstallDirs)
 #######################
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
-option(BUILD_ROS_PLUGINS "Enable building ROS dependent plugins" OFF)
+option(BUILD_ROS_PLUGINS "Enable building ROS dependent plugins" ON)
 option(GENERATE_ROS_MODELS "Generate model sdf for ROS environment" OFF)
 
 option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
@@ -365,7 +365,16 @@ add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/mavlink_interface.cpp)
 add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
-add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
+
+
+
+#add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
+#target_link_libraries(rosgazebo_wind_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
+#list(APPEND plugins rosgazebo_wind_plugin)
+#message(STATUS "adding rosgazebo_wind_plugin to build")
+
+
+
 add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp src/geo_mag_declination.cpp)
 add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
 add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
@@ -373,6 +382,7 @@ add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp
 add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
+add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 
 set(plugins
   gazebo_airspeed_plugin
@@ -391,8 +401,8 @@ set(plugins
   gazebo_imu_plugin
   gazebo_mavlink_interface
   gazebo_motor_model
-  gazebo_multirotor_base_plugin
-  gazebo_wind_plugin
+  gazebo_multirotor_base_plugin  
+  gazebo_wind_plugin  
   gazebo_magnetometer_plugin
   gazebo_barometer_plugin
   gazebo_catapult_plugin
@@ -414,6 +424,11 @@ if (BUILD_ROS_PLUGINS)
   target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
   list(APPEND plugins gazebo_motor_failure_plugin)
   message(STATUS "adding gazebo_motor_failure_plugin to build")
+  
+  add_library(rosgazebo_wind_plugin SHARED src/rosgazebo_wind_plugin.cpp)
+  target_link_libraries(rosgazebo_wind_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
+  list(APPEND plugins rosgazebo_wind_plugin)
+  message(STATUS "adding rosgazebo_wind_plugin to build")
 
   include_directories(
     include
@@ -422,6 +437,13 @@ if (BUILD_ROS_PLUGINS)
   )
 
   target_link_libraries(gazebo_motor_failure_plugin
+    ${catkin_LIBRARIES}
+    ${roscpp_LIBRARIES}
+    ${GAZEBO_libraries}
+  )
+  
+  
+   target_link_libraries(gazebo_wind_plugin
     ${catkin_LIBRARIES}
     ${roscpp_LIBRARIES}
     ${GAZEBO_libraries}
